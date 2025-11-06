@@ -182,10 +182,10 @@ local animations = {
         {name = "Come Here", id = "127772514180203"},
         {name = "Ok", id = "100188963456227"},
         {name = "Nuh-Uh!", id = "82374480951071"},
-		{name = "Finger Gun", id = "81100102810594"},
-		{name = "Peace Sign", id = "72361092556872"},
-		{name = "Hold", id = "77423395801230"},
-		{name = "Think", id = "121922614712085"}
+        {name = "Finger Gun", id = "81100102810594"},
+        {name = "Peace Sign", id = "72361092556872"},
+        {name = "Hold", id = "77423395801230"},
+        {name = "Think", id = "121922614712085"}
     },
     ["Misc"] = {
         {name = "Fake Death", id = "126527283467855"},
@@ -210,7 +210,7 @@ local animations = {
         {name = "Billy Bounce", id = "133394554631338"},
         {name = "Orange Justice", id = "95127716920692"},
         {name = "Get Griddy", id = "121966805049108"},
-		{name = "Gangnam Style", id = "78801539668900"},
+        {name = "Gangnam Style", id = "78801539668900"},
         {name = "Arm Swings (Metroman)", id = "71043409187026"}
     }
 }
@@ -237,7 +237,7 @@ local function playAnimation(animationId)
     currentAnim = humanoid:LoadAnimation(animation)
     currentAnim:Play()
     
-    print("Reproduciendo animación: " .. animationId)
+    print("Playing animation: " .. animationId)
 end
 
 local function stopAllAnimations()
@@ -255,89 +255,91 @@ local function stopAllAnimations()
         end
     end
     
-    print("Todas las animaciones detenidas")
+    print("All animations stopped")
 end
 
 local function setupViewport(viewport, animId)
-    local character = player.Character
-    if not character then 
-        warn("No se encontró el personaje")
-        return 
-    end
-    
-    local clone = character:Clone()
-    
-    for _, obj in pairs(clone:GetDescendants()) do
-        if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
-            obj:Destroy()
-        end
-    end
-    
-    local humanoid = clone:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-    end
-    
-    clone.Parent = viewport
-    
-    local camera = Instance.new("Camera")
-    camera.Parent = viewport
-    viewport.CurrentCamera = camera
-    viewport.LightingEnabled = true
-    viewport.Ambient = Color3.fromRGB(255, 255, 255)
-    
-    local rootPart = clone:FindFirstChild("HumanoidRootPart")
-    if rootPart then
-        rootPart.Anchored = true
-        
-        local modelCFrame = clone:GetBoundingBox()
-        local modelSize = clone:GetExtentsSize()
-        local maxDimension = math.max(modelSize.X, modelSize.Y, modelSize.Z)
-        local distance = maxDimension * 2.5
-        
-        camera.CFrame = CFrame.new(modelCFrame.Position + Vector3.new(0, 0, distance), modelCFrame.Position)
-        camera.FieldOfView = 40
-        
-        local connection
-        connection = RunService.RenderStepped:Connect(function()
-            if clone and clone.Parent and rootPart and rootPart.Parent then
-                rootPart.CFrame = rootPart.CFrame * CFrame.Angles(0, math.rad(0.8), 0)
-            else
-                if connection then
-                    connection:Disconnect()
-                end
-            end
-        end)
-        
-        if humanoid and animId then
-            task.wait(0.1)
-            
-            local animation = Instance.new("Animation")
-            animation.AnimationId = "rbxassetid://" .. animId
-            
-            local animTrack = humanoid:LoadAnimation(animation)
-            animTrack.Looped = true
-            animTrack:Play()
-            
-            viewportClones[viewport] = {
-                clone = clone,
-                anim = animTrack,
-                connection = connection
-            }
-        end
-    end
-    
-    return clone
+	local player = game.Players.LocalPlayer
+	local char = player.Character or player.CharacterAdded:Wait()
+
+	viewport:ClearAllChildren()
+	viewport.LightColor = Color3.new(1, 1, 1)
+	viewport.Ambient = Color3.new(1, 1, 1)
+	viewport.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	viewport.BackgroundTransparency = 0
+
+	local worldModel = Instance.new("WorldModel")
+	worldModel.Parent = viewport
+
+	local clone = char:Clone()
+	for _, obj in ipairs(clone:GetDescendants()) do
+		if obj:IsA("Script") or obj:IsA("LocalScript") then
+			obj:Destroy()
+		elseif obj:IsA("BasePart") then
+			obj.Anchored = true
+			obj.CanCollide = false
+			obj.CastShadow = false
+		end
+	end
+	clone.Parent = worldModel
+
+	local root = clone:FindFirstChild("HumanoidRootPart") or clone:FindFirstChild("Torso")
+	if not root then
+		warn("No se encontró la raíz del personaje")
+		return
+	end
+
+	clone.PrimaryPart = root
+	clone:PivotTo(CFrame.new(0, 0, 0))
+
+	local camera = Instance.new("Camera")
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.Parent = viewport
+	viewport.CurrentCamera = camera
+
+	-- Ajustar automáticamente la distancia según el tamaño del modelo
+	local _, size = clone:GetBoundingBox()
+	local radius = math.max(size.X, size.Z) * 1.5
+	local height = size.Y * 0.5
+	local angle = 0
+
+	-- Animación
+	local humanoid = clone:FindFirstChildOfClass("Humanoid")
+	local animator
+	if humanoid then
+		animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+	else
+		local controller = Instance.new("AnimationController", clone)
+		animator = Instance.new("Animator", controller)
+	end
+
+	local animation = Instance.new("Animation")
+	animation.AnimationId = "rbxassetid://" .. animId
+
+	local success, track = pcall(function()
+		return animator:LoadAnimation(animation)
+	end)
+
+	if success and track then
+		track.Looped = true
+		track:Play()
+	end
+
+	game:GetService("RunService").RenderStepped:Connect(function(dt)
+		angle = (angle + dt * 0.5) % (math.pi * 2)
+		local camPos = Vector3.new(math.sin(angle) * radius, height, math.cos(angle) * radius)
+		camera.CFrame = CFrame.new(camPos, Vector3.new(0, height * 0.9, 0))
+	end)
 end
 
 local function createAnimCard(anim, col, row)
     local buttonSize = 130
-    local spacing = 10
+    local spacing = 25
     
     local card = Instance.new("Frame")
     card.Name = anim.name .. "Card"
     card.Size = UDim2.new(0, buttonSize, 0, buttonSize + 30)
-    card.Position = UDim2.new(0, col * (buttonSize + spacing), 0, row * (buttonSize + spacing))
+    card.Position = UDim2.new(0, col * (buttonSize + spacing), 0, row * (buttonSize + spacing + 10))
     card.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
     card.BackgroundTransparency = 0.4
     card.BorderSizePixel = 0
@@ -385,6 +387,17 @@ local function createAnimCard(anim, col, row)
     viewStroke.Transparency = 0.7
     viewStroke.Parent = viewport
     
+    -- Indicador de carga
+    local loadingLabel = Instance.new("TextLabel")
+    loadingLabel.Name = "LoadingLabel"
+    loadingLabel.Size = UDim2.new(1, 0, 1, 0)
+    loadingLabel.BackgroundTransparency = 1
+    loadingLabel.Text = "Loading..."
+    loadingLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    loadingLabel.TextSize = 10
+    loadingLabel.Font = Enum.Font.Gotham
+    loadingLabel.Parent = viewport
+    
     local clickButton = Instance.new("TextButton")
     clickButton.Name = "ClickButton"
     clickButton.Size = UDim2.new(1, 0, 1, 0)
@@ -393,8 +406,18 @@ local function createAnimCard(anim, col, row)
     clickButton.ZIndex = 2
     clickButton.Parent = card
     
+    -- Configurar viewport en un hilo separado
     task.spawn(function()
-        setupViewport(viewport, anim.id)
+        local success = pcall(function()
+            setupViewport(viewport, anim.id)
+        end)
+        
+        if success then
+            loadingLabel:Destroy()
+        else
+            loadingLabel.Text = "Error"
+            loadingLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
     end)
     
     clickButton.MouseEnter:Connect(function()
@@ -413,6 +436,7 @@ local function createAnimCard(anim, col, row)
 end
 
 local function updateAnimationButtons()
+    -- Limpiar viewports anteriores
     for _, child in pairs(buttonContainer:GetChildren()) do
         if child:IsA("Frame") then
             for viewport, data in pairs(viewportClones) do
@@ -433,7 +457,7 @@ local function updateAnimationButtons()
     local animList = animations[selectedCategory]
     local columns = 3
     local buttonSize = 130
-    local spacing = 10
+    local spacing = 15
     
     for i, anim in ipairs(animList) do
         local col = (i - 1) % columns
@@ -442,7 +466,7 @@ local function updateAnimationButtons()
     end
     
     local totalRows = math.ceil(#animList / columns)
-    buttonContainer.CanvasSize = UDim2.new(0, 0, 0, totalRows * (buttonSize + 40 + spacing))
+    buttonContainer.CanvasSize = UDim2.new(0, 0, 0, totalRows * (buttonSize + 40 + spacing) + 10)
 end
 
 local categoryButtons = {}
@@ -556,12 +580,12 @@ end)
 local function initializeHub()
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         updateAnimationButtons()
-        print("Animation Hub inicializado correctamente!")
+        print("Animation Hub initialized successfully!")
     else
         player.CharacterAdded:Wait()
         task.wait(0.5)
         updateAnimationButtons()
-        print("Animation Hub inicializado después de CharacterAdded!")
+        print("Animation Hub initialized after CharacterAdded!")
     end
 end
 
