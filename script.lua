@@ -184,7 +184,6 @@ local animations = {
         {name = "Nuh-Uh!", id = "82374480951071"},
 		{name = "Finger Gun", id = "81100102810594"},
 		{name = "Peace Sign", id = "72361092556872"},
-		{name = "Pat", id = "103278273067294"},
 		{name = "Hold", id = "77423395801230"},
 		{name = "Think", id = "121922614712085"}
     },
