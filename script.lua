@@ -211,7 +211,8 @@ local animations = {
         {name = "Orange Justice", id = "95127716920692"},
         {name = "Get Griddy", id = "121966805049108"},
         {name = "Gangnam Style", id = "78801539668900"},
-        {name = "Arm Swings (Metroman)", id = "71043409187026"}
+        {name = "Arm Swings (Metroman)", id = "71043409187026"},
+		{name = "I WANNA RUN AWAY", id = "76459424967458"}
     }
 }
 
