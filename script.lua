@@ -3,7 +3,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local playerGui = game:WaitForChild("CoreGui")
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AnimationHub"
@@ -212,7 +212,8 @@ local animations = {
         {name = "Get Griddy", id = "121966805049108"},
         {name = "Gangnam Style", id = "78801539668900"},
         {name = "Arm Swings (Metroman)", id = "71043409187026"},
-		{name = "I WANNA RUN AWAY", id = "76459424967458"}
+		{name = "I WANNA RUN AWAY", id = "76459424967458"},
+		{name = "Hakari (Lonely Lonely)", id = "72935992500498"}
     }
 }
 
