@@ -39,7 +39,7 @@ notifGlow.Size = UDim2.new(1, 40, 1, 40)
 notifGlow.Position = UDim2.new(0.5, -20, 0.5, -20)
 notifGlow.AnchorPoint = Vector2.new(0.5, 0.5)
 notifGlow.BackgroundTransparency = 1
-notifGlow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+notifGlow.Image = "rbxassetid://0"
 notifGlow.ImageColor3 = Color3.fromRGB(100, 150, 255)
 notifGlow.ImageTransparency = 0.8
 notifGlow.ScaleType = Enum.ScaleType.Slice
@@ -100,7 +100,7 @@ mainGlow.Size = UDim2.new(1, 60, 1, 60)
 mainGlow.Position = UDim2.new(0.5, -30, 0.5, -30)
 mainGlow.AnchorPoint = Vector2.new(0.5, 0.5)
 mainGlow.BackgroundTransparency = 1
-mainGlow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+mainGlow.Image = "rbxassetid://0"
 mainGlow.ImageColor3 = Color3.fromRGB(100, 150, 255)
 mainGlow.ImageTransparency = 0.9
 mainGlow.ScaleType = Enum.ScaleType.Slice
@@ -137,7 +137,7 @@ title.Name = "Title"
 title.Size = UDim2.new(0, 200, 1, -5)
 title.Position = UDim2.new(0, 20, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "✨ Anim Hub"
+title.Text = "Animation Hub"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 20
 title.Font = Enum.Font.GothamBold
@@ -188,7 +188,7 @@ closeButton.Position = UDim2.new(1, -43, 0, 6)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 80, 100)
 closeButton.BackgroundTransparency = 0.2
 closeButton.BorderSizePixel = 0
-closeButton.Text = "✕"
+closeButton.Text = "X"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 18
 closeButton.Font = Enum.Font.GothamBold
@@ -272,7 +272,8 @@ local animations = {
         {name = "Fake Death", id = "126527283467855"},
         {name = "Ground Tilt", id = "111300849035882"},
         {name = "Head", id = "73753845465382"},
-        {name = "Cute Sit", id = "92270419093034"}
+        {name = "Cute Sit", id = "92270419093034"},
+		{name = "Kid Tantrum", id = "86339673982616"}
     },
     ["Glitches"] = {
         {name = "Bouncy Twirl", id = "14352343065"},
